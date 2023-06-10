@@ -18,6 +18,16 @@ resource "azurerm_public_ip" "ip" {
   allocation_method   = "Static"
 }
 
+resource "tls_private_key" "ansible_key" { #to create a private for accessing the vm
+  algorithm = "RSA"
+  rsa_bits = 4096
+}
+resource "local_file" "ansiblekey" { # Storing the private key locally in a file
+  filename="ansiblekey.pem"  
+  content=tls_private_key.ansible_key.private_key_pem 
+}
+
+
 resource "azurerm_network_security_group" "netsg" {
   name                = "acceptanceTestSecurityGroup1"
   location            = var.rglocation
@@ -49,7 +59,6 @@ resource "azurerm_subnet" "SubnetA" {
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.2.0/24"]
 }
-
 resource "azurerm_network_interface" "app_interface" {
   name                = "ansible"
   location            = var.rglocation
@@ -68,44 +77,41 @@ resource "azurerm_network_interface" "app_interface" {
     azurerm_subnet.SubnetA
   ]
 }
-
-
-
-resource "azurerm_linux_virtual_machine_scale_set" "ansible" {
-  name                = "ansible-vmss"
+resource "azurerm_linux_virtual_machine" "linux_vm" {
+  name                = "ansible"
   resource_group_name = var.rgname
   location            = var.rglocation
-  sku                 = "Standard_F2"
-  instances           = 2
-  admin_username      = "azureuser"
-
+  size                = "Standard_D2s_v3"
+  admin_username      = "azureuser"  
+  network_interface_ids = [
+    azurerm_network_interface.app_interface.id,
+  ]
   admin_ssh_key {
     username   = "azureuser"
-    public_key = file("~/.ssh/id_rsa.pub")
+    public_key = tls_private_key.ansible_key.public_key_openssh
+  }
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
   }
 
   source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
+    sku       = "18.04-LTS"
     version   = "latest"
   }
 
-  os_disk {
-    storage_account_type = "Standard_LRS"
-    caching              = "ReadWrite"
-  }
-   network_interface {
-    name    = "ansible"
-    primary = true
-
-    ip_configuration {
-      name      = "internal"
-      subnet_id = azurerm_subnet.SubnetA.id
-    }
-  }
-
+  depends_on = [
+    azurerm_network_interface.app_interface,
+    tls_private_key.ansible_key
+  ]
 }
+
+
+
+
+
 resource "azurerm_subnet_network_security_group_association" "nsg_association" {
   subnet_id                 = azurerm_subnet.SubnetA.id
   network_security_group_id = azurerm_network_security_group.netsg.id
