@@ -1,0 +1,11 @@
+---
+- name: Install Docker
+  become: yes
+  hosts: Docker-server
+  tasks:
+    - name: Install Docker
+      apt:
+	name: docker
+	update_cache: yes
+	state: present
+
