@@ -1,11 +1,15 @@
 ---
-- name: Install Docker
+- name: Install Docker and python3
   become: yes
   hosts: Docker-server
   tasks:
-    - name: Install Docker
+    - name: Install Docker and python3
+      vars:
+        ansible_python_interpreter: /usr/bin/python
       apt:
-	name: docker
-	update_cache: yes
-	state: present
+        name: 
+          - docker
+          - python3
+        update_cache: yes
+        state: present
 
