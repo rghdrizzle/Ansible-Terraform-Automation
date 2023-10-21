@@ -19,6 +19,15 @@
         dest: /usr/local/bin/docker-compose
         mode: 'u+x,g+x'
         
+- name: Start docker daemon
+  become: yes
+  hosts: Docker-server
+  tasks:
+    - name: Start docker daemon
+      systemd:
+        name: docker
+        state: started
+        
 - name: Add azure user to docker group
   become: yes
   hosts: Docker-server
@@ -28,4 +37,6 @@
         name: azureuser
         groups: docker
         append: yes
+    - name: Reconnect server session
+      meta: reset_connection
 
