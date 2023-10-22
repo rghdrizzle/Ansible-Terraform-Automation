@@ -8,6 +8,7 @@ terraform {
 }
 variable "rgname" {}
 variable "rglocation" {}
+variable "ssh_key_path" {}
 provider "azurerm" {
     features {}
 }
@@ -102,6 +103,11 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     version   = "latest"
   }
 
+  provisioner "local-exec" {
+    working_dir = "./ansible"
+    command = "ansible-playbook --inventory ${self.public_ip},deploy-docker.yaml --private-key ${var.ssh_key_path} --user azureuser"
+  }
+
   depends_on = [
     azurerm_network_interface.app_interface,
     tls_private_key.ansible_key
@@ -119,6 +125,9 @@ resource "azurerm_subnet_network_security_group_association" "nsg_association" {
     azurerm_network_security_group.netsg
   ]
 }
+
 output "ipaddress" {
   value =  azurerm_public_ip.ip.id
+
+  depends_on = [ azurerm_public_ip.ip ]
 }
