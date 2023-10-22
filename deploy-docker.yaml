@@ -1,6 +1,7 @@
 ---
 - name: Install Docker and python3
   become: yes
+  gather-facts: False
   hosts: Docker-server
   tasks:
     - name: Install Docker and python3
@@ -18,6 +19,11 @@
         url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
         dest: /usr/local/bin/docker-compose
         mode: 'u+x,g+x'
+    - name: Install docker in python
+        pip:
+          name:
+            - docker
+            - docker-compose
         
 - name: Start docker daemon
   become: yes
