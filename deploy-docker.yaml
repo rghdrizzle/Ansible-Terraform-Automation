@@ -20,10 +20,10 @@
         dest: /usr/local/bin/docker-compose
         mode: 'u+x,g+x'
     - name: Install docker in python
-        pip:
-          name:
-            - docker
-            - docker-compose
+      pip:
+        name:
+          - docker
+          - docker-compose
         
 - name: Start docker daemon
   become: yes
