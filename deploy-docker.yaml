@@ -1,7 +1,22 @@
 ---
+- name: Ensure ssh connection is possible
+  hosts: all
+  gather_facts: False
+  tasks:
+    - name: ensuring the connection
+      wait_for:
+        port: 22
+        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+        search_regex: OpenSSH
+        delay: 10
+        timeout: 100
+      vars:
+        ansible_connection: local
+        ansible_python_interpreter: /usr/bin/python
+        
 - name: Install Docker and python3
   become: yes
-  gather-facts: False
+  gather_facts: False
   hosts: all
   tasks:
     - name: Install Docker and python3
