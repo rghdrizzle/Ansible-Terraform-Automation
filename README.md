@@ -29,6 +29,7 @@ As you can see it also configured the server with the help of ansible and in the
 Thank you for reading this.
 
 ### Links used
-https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource
-https://docs.ansible.com/ansible/latest/collections/ansible/builtin/wait_for_module.html
-https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax
+<li>https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource</li>
+<li>https://docs.ansible.com/ansible/latest/collections/ansible/builtin/wait_for_module.html</li>
+<li>https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax</li>
+<li>https://docs.ansible.com/ansible/latest/collections/ansible/builtin/meta_module.html</li>
