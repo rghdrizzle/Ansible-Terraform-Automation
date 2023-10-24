@@ -105,7 +105,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
 
   provisioner "local-exec" {
     working_dir = "./ansible"
-    command = "ansible-playbook --inventory ${self.public_ip},deploy-docker.yaml --private-key ${var.ssh_key_path} --user azureuser"
+    command = "ansible-playbook --inventory '${self.public_ip_address},' deploy-docker.yaml --private-key ${var.ssh_key_path} --user azureuser"
   }
 
   depends_on = [
@@ -113,6 +113,7 @@ resource "azurerm_linux_virtual_machine" "linux_vm" {
     tls_private_key.ansible_key
   ]
 }
+
 
 
 
@@ -127,7 +128,7 @@ resource "azurerm_subnet_network_security_group_association" "nsg_association" {
 }
 
 output "ipaddress" {
-  value =  azurerm_public_ip.ip.id
+  value =  azurerm_linux_virtual_machine.linux_vm.public_ip_address
 
   depends_on = [ azurerm_public_ip.ip ]
 }
